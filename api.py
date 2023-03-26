@@ -23,7 +23,8 @@ class WireFishSniffer:
 
     def reset(self):
         self.flush()
-        os.remove("./tmp/dump.pcap")
+        if os.path.exists("./tmp/dump.pcap"):
+            os.remove("./tmp/dump.pcap")
 
     def sniffer_callback(self, pkt):
         self.packet_info_dump.append(pkt.show(dump=True).replace(" ", ""))
@@ -52,7 +53,7 @@ class WireFishSniffer:
         self.status = "idle"
 
     def get_update(self, num_current):
-        return " ||| ".join(self.packet_info_dump[num_current:])
+        return "@@@@@@@@".join(self.packet_info_dump[num_current:])
 
 
 if __name__ == "__main__":

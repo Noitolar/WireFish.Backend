@@ -29,7 +29,7 @@ def start():
     if sniffer.status == "idle":
         count = flask.request.args.get("count")
         timeout = flask.request.args.get("timeout")
-        sniffer.sniff_realtime(count, timeout)
+        sniffer.sniff_realtime(int(count), int(timeout))
         return flask.jsonify({"result": "[o] sniffer starts."})
     else:
         return flask.jsonify({"result": "[x] sniffer is buzy."})
@@ -51,7 +51,7 @@ def set_filter():
 
 @app.route("/api/update", methods=["get"])
 def update():
-    num_current = flask.request.args.get("num_current")
+    num_current = int(flask.request.args.get("num_current"))
     if num_current == len(sniffer.packet_info_dump):
         if sniffer.status == "idle":
             return flask.jsonify({"result": "[o] sniffer has stopped.", "data": ""})
@@ -62,5 +62,5 @@ def update():
 
 
 if __name__ == "__main__":
-    app.run(host="localhost", port=8888)
-    print("[o] app running at http://localhost:8888")
+    app.run(host="localhost", port=5000)
+    print("[o] app running at http://localhost:5000")
