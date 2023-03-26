@@ -1,0 +1,59 @@
+import warnings
+
+warnings.filterwarnings("ignore")
+from scapy.all import *
+import os
+
+
+class WireFishSniffer:
+    def __init__(self, target_interface=None, packet_filter=None):
+        self.target_interface = target_interface
+        self.packet_filter = packet_filter
+        self.packet_dump = None
+        self.packet_info_dump = []
+
+    @staticmethod
+    def get_network_interfaces(resolve_mac=False, print_result=False):
+        return show_interfaces(resolve_mac, print_result)
+
+    def flush(self):
+        self.packet_info_dump.clear()
+        self.packet_dump = None
+
+    def reset(self):
+        self.flush()
+        os.remove("./tmp/tmp.pcap")
+
+    def sniffer_callback(self, pkt):
+        self.packet_info_dump.append(pkt.show(dump=True).replace(" ", ""))
+
+    def sniff_realtime(self, count=0, timeout=5, store=True):
+        self.packet_dump = sniff(
+            iface=self.target_interface,
+            count=count,
+            store=store,
+            prn=self.sniffer_callback,
+            filter=self.packet_filter,
+            timeout=timeout)
+        wrpcap("./tmp/tmp.pcap", self.packet_dump)
+        return self.packet_dump
+
+    def sniff_offline(self, ):
+        self.flush()
+        self.packet_dump = sniff(
+            offline="./tmp/dump.pcap",
+            store=False,
+            prn=self.sniffer_callback,
+            filter=self.packet_filter)
+
+
+if __name__ == "__main__":
+    sniffer = WireFishSniffer()
+    # for index, interface, ip, mac in WireFishSniffer.get_network_interfaces(resolve_mac=True, print_result=False):
+    #     print(f"{interface} ||| {ip} ||| {mac}")
+
+    sniffer.target_interface = "Realtek Gaming 2.5GbE Family Controller"
+    sniffer.packet_filter = "tcp"
+    pkts = sniffer.sniff_realtime(count=2)
+    # print(sniffer.packet_info_dump)
+    sniffer.packet_dump.show()
