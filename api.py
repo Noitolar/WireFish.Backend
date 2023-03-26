@@ -23,7 +23,7 @@ class WireFishSniffer:
 
     def reset(self):
         self.flush()
-        os.remove("./tmp/tmp.pcap")
+        os.remove("./tmp/dump.pcap")
 
     def sniffer_callback(self, pkt):
         self.packet_info_dump.append(pkt.show(dump=True).replace(" ", ""))
@@ -38,7 +38,7 @@ class WireFishSniffer:
             prn=self.sniffer_callback,
             filter=self.packet_filter,
             timeout=timeout)
-        wrpcap("./tmp/tmp.pcap", self.packet_dump)
+        wrpcap("./tmp/dump.pcap", self.packet_dump)
         self.status = "idle"
 
     def sniff_offline(self, ):
@@ -46,7 +46,7 @@ class WireFishSniffer:
         self.flush()
         self.packet_dump = sniff(
             offline="./tmp/dump.pcap",
-            store=False,
+            store=True,
             prn=self.sniffer_callback,
             filter=self.packet_filter)
         self.status = "idle"
@@ -62,5 +62,8 @@ if __name__ == "__main__":
 
     sniffer.target_interface = "Realtek Gaming 2.5GbE Family Controller"
     sniffer.packet_filter = "tcp"
-    print(sniffer.packet_info_dump)
+    sniffer.sniff_realtime(5)
     sniffer.packet_dump.show()
+
+    # sniffer.sniff_offline()
+    # sniffer.packet_dump.show()
