@@ -11,6 +11,7 @@ class WireFishSniffer:
         self.packet_filter = packet_filter
         self.packet_dump = None
         self.packet_info_dump = []
+        self.status = "idle"
 
     @staticmethod
     def get_network_interfaces(resolve_mac=False, print_result=False):
@@ -27,24 +28,31 @@ class WireFishSniffer:
     def sniffer_callback(self, pkt):
         self.packet_info_dump.append(pkt.show(dump=True).replace(" ", ""))
 
-    def sniff_realtime(self, count=0, timeout=5, store=True):
+    def sniff_realtime(self, count=0, timeout=5):
+        self.status = "buzy"
+        self.reset()
         self.packet_dump = sniff(
             iface=self.target_interface,
             count=count,
-            store=store,
+            store=True,
             prn=self.sniffer_callback,
             filter=self.packet_filter,
             timeout=timeout)
         wrpcap("./tmp/tmp.pcap", self.packet_dump)
-        return self.packet_dump
+        self.status = "idle"
 
     def sniff_offline(self, ):
+        self.status = "buzy"
         self.flush()
         self.packet_dump = sniff(
             offline="./tmp/dump.pcap",
             store=False,
             prn=self.sniffer_callback,
             filter=self.packet_filter)
+        self.status = "idle"
+
+    def get_update(self, num_current):
+        return " ||| ".join(self.packet_info_dump[num_current:])
 
 
 if __name__ == "__main__":
@@ -54,6 +62,5 @@ if __name__ == "__main__":
 
     sniffer.target_interface = "Realtek Gaming 2.5GbE Family Controller"
     sniffer.packet_filter = "tcp"
-    pkts = sniffer.sniff_realtime(count=2)
-    # print(sniffer.packet_info_dump)
+    print(sniffer.packet_info_dump)
     sniffer.packet_dump.show()
