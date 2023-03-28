@@ -2,7 +2,6 @@ import warnings
 
 warnings.filterwarnings("ignore")
 from scapy.all import *
-import os
 import utils
 
 
@@ -24,8 +23,8 @@ class WireFishSniffer:
 
     def reset(self):
         self.flush()
-        if os.path.exists("./tmp/dump.pcap"):
-            os.remove("./tmp/dump.pcap")
+        # if os.path.exists("./tmp/dump.pcap"):
+        #     os.remove("./tmp/dump.pcap")
 
     def sniffer_callback(self, pkt):
         self.infos.append(pkt.show(dump=True))
@@ -40,18 +39,18 @@ class WireFishSniffer:
             prn=self.sniffer_callback,
             filter=self.packet_filter,
             timeout=timeout)
-        wrpcap("./tmp/dump.pcap", self.packets)
+        # wrpcap("./tmp/dump.pcap", self.packets)
         self.status = "idle"
 
-    def sniff_offline(self, ):
-        self.status = "buzy"
-        self.flush()
-        self.packets = sniff(
-            offline="./tmp/dump.pcap",
-            store=True,
-            prn=self.sniffer_callback,
-            filter=self.packet_filter)
-        self.status = "idle"
+    # def sniff_offline(self, ):
+    #     self.status = "buzy"
+    #     self.flush()
+    #     self.packets = sniff(
+    #         offline="./tmp/dump.pcap",
+    #         store=True,
+    #         prn=self.sniffer_callback,
+    #         filter=self.packet_filter)
+    #     self.status = "idle"
 
     def get_update(self, num_current):
         return [utils.scapy_str_to_dict(info) for info in self.infos[num_current:]]
