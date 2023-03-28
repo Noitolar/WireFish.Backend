@@ -39,12 +39,13 @@ def start():
 def set_filter():
     if sniffer.status == "idle":
         new_filter = flask.request.args.get("new_filter")
-        if sniffer.packet_dump is None:
+        if sniffer.packets is None:
             sniffer.packet_filter = new_filter
             return flask.jsonify({"result": f"[o] new filter <{new_filter}> set.", "data": ""})
         else:
-            sniffer.sniff_offline()
-            return flask.jsonify({"result": f"[o] refiltered by new filter <{sniffer.packet_filter}>.", "data": sniffer.get_update(0)})
+            # sniffer.sniff_offline()
+            # return flask.jsonify({"result": f"[o] refiltered by new filter <{sniffer.packet_filter}>.", "data": sniffer.get_update(0)})
+            return flask.jsonify({"result": "[x] offline filter is not supportted due to shitty scapy.", "data": ""})
     else:
         return flask.jsonify({"result": "[x] sniffer is buzy.", "data": ""})
 
@@ -52,7 +53,7 @@ def set_filter():
 @app.route("/api/update", methods=["get"])
 def update():
     num_current = int(flask.request.args.get("num_current"))
-    if num_current == len(sniffer.packet_info_dump):
+    if num_current == len(sniffer.infos):
         if sniffer.status == "idle":
             return flask.jsonify({"result": "[o] sniffer has stopped.", "data": ""})
         else:
