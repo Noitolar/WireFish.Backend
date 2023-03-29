@@ -13,8 +13,8 @@ def index():
     return "<h1>Hello!<h1/>"
 
 
-@app.route("/api/select_interface", methods=["get"])
-def select_interface():
+@app.route("/api/set_interface", methods=["get"])
+def set_interface():
     target_interface = flask.request.args.get("target_interface")
     if target_interface in [interface_info[1] for interface_info in sniffer.get_network_interfaces()]:
         sniffer.reset()
@@ -24,8 +24,8 @@ def select_interface():
         return flask.jsonify({"result": f"[x] interface <{target_interface}> is invalid."})
 
 
-@app.route("/api/start", methods=["get"])
-def start():
+@app.route("/api/start_sniffer", methods=["get"])
+def start_sniffer():
     if sniffer.status == "idle":
         count = flask.request.args.get("count")
         timeout = flask.request.args.get("timeout")
@@ -60,6 +60,16 @@ def update():
             return flask.jsonify({"result": "[o] this is the last update.", "data": sniffer.get_update(num_current)})
     else:
         return flask.jsonify({"result": "[o] updated.", "data": sniffer.get_update(num_current)})
+
+
+@app.route("/api/sessions", methods=["get"])
+def sessions():
+    if sniffer.packets is None:
+        return flask.jsonify({"result": "[x] sniffer hasn't capture anything yet.", "data": ""})
+    elif sniffer.status == "buzy":
+        return flask.jsonify({"result": "[x] sniffer is buzy.", "data": ""})
+    else:
+        return flask.jsonify({"result": "[o] sessions extracted.", "data": sniffer.extract_sessions()})
 
 
 if __name__ == "__main__":

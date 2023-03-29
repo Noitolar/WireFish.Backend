@@ -14,7 +14,6 @@ class WireFishSniffer:
         self.packet_filter = packet_filter
         self.packets = None
         self.infos = []
-        self.session_infos = []
         self.status = "idle"
 
     @staticmethod
@@ -27,44 +26,14 @@ class WireFishSniffer:
 
     def reset(self):
         self.flush()
+        self.status = "idle"
         # if os.path.exists("./tmp/dump.pcap"):
         #     os.remove("./tmp/dump.pcap")
 
     def sniffer_callback(self, pkt: scapy.packet.Packet):
-        index = len(self.infos)
-        cap_time = pkt.time
-        summary = pkt.summary()
-        protocol = " / ".join([x if len(x) < 8 and x.isalnum() else x.split(" ")[0] for x in summary.split(" / ")])
-        details = pkt.show(dump=True).replace(" ", "")
-
-        src = ""
-        dst = ""
-        if pkt.haslayer("IP"):
-            src = pkt["IP"].src
-            dst = pkt["IP"].dst
-        elif pkt.haslayer("IPv6"):
-            src = pkt["IPv6"].src
-            dst = pkt["IPv6"].dst
-        elif pkt.haslayer("Ethernet"):
-            src = pkt["Ethernet"].src
-            dst = pkt["Ethernet"].dst
-
-        if pkt.haslayer("TCP"):
-            src += f":{pkt['TCP'].sport}"
-            dst += f":{pkt['TCP'].dport}"
-        elif pkt.haslayer("UDP"):
-            src += f":{pkt['UDP'].sport}"
-            dst += f":{pkt['UDP'].dport}"
-
-        info_string = ""
-        info_string += f"index={index}\n"
-        info_string += f"cap_time={cap_time}\n"
-        info_string += f"protocol={protocol}\n"
-        info_string += f"src={src}\n"
-        info_string += f"dst={dst}\n"
-        info_string += f"summary={summary}\n"
-        info_string += details
-        self.infos.append(utils.scapy_str_to_dict(info_string))
+        info_string = utils.extrac_packet_info(pkt)
+        # info_string = f"index={len(self.infos)}\n" + info_string
+        self.infos.append(info_string)
 
     def sniff_realtime(self, count=0, timeout=5):
         self.status = "buzy"
@@ -93,7 +62,11 @@ class WireFishSniffer:
         return [utils.scapy_str_to_dict(info) for info in self.infos[num_current:]]
 
     def extract_sessions(self):
-        sessions = self.packets.sessions()
+        session_indexes = []
+        sessions = self.packets.sessions().values()
+        for session in sessions:
+            session_indexes.append([self.infos.index(utils.extrac_packet_info(pkt)) for pkt in session])
+        return session_indexes
 
 
 if __name__ == "__main__":
@@ -103,10 +76,10 @@ if __name__ == "__main__":
 
     # sniffer.target_interface = "Realtek Gaming 2.5GbE Family Controller"
     # sniffer.target_interface = "Realtek RTL8852AE WiFi 6 802.11ax PCIe Adapter"
-    # sniffer.packet_filter = "ip.src==10.211.2.211"
-    # sniffer.packet_filter = "ip.src==10.202.40.207"
+    # sniffer.packet_filter = "ip host 10.211.2.211"
 
-    sniffer.sniff_realtime(1)
+    sniffer.sniff_realtime(200)
     # sniffer.packets.show()
     # print(sniffer.get_update(0))
-    pprint.pprint(sniffer.infos[0])
+    # pprint.pprint(utils.scapy_str_to_dict(sniffer.infos[0]))
+    print(sniffer.extract_sessions())
