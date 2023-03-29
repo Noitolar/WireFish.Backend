@@ -2,7 +2,7 @@ import re
 
 
 def scapy_str_to_dict(scapy_str):
-    infos = scapy_str.replace(" ", "").split("\n")
+    infos = scapy_str.split("\n")
     datadict = dict()
     header = None
     for info in infos:
@@ -10,9 +10,12 @@ def scapy_str_to_dict(scapy_str):
             header = re.sub(u"([^\u0041-\u005a\u0061-\u007a\u0030-\u0039])", "", info)
             datadict[header] = dict()
             continue
-        if "=" in info and header is not None:
+        if "=" in info:
             datas = info.split("=")
-            key = datas[0]
+            key = datas[0].replace("|", "")
             value = "=".join(datas[1:])
-            datadict[header][key] = value
+            if header is not None:
+                datadict[header][key] = value
+            else:
+                datadict[key] = value
     return datadict
