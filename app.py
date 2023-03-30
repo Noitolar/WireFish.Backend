@@ -4,6 +4,7 @@ import api
 
 app = flask.Flask(__name__)
 flask_cors.CORS(app, resource={r'/*': {'origins': '*'}})
+FLASK_DEBUG = 1
 
 sniffer = api.WireFishSniffer()
 
@@ -27,17 +28,6 @@ def set_interface():
         return flask.jsonify({"result": "[x] sniffer is buzy."})
 
 
-@app.route("/api/start_sniffer", methods=["get"])
-def start_sniffer():
-    if sniffer.status == "idle":
-        count = flask.request.args.get("count")
-        timeout = flask.request.args.get("timeout")
-        sniffer.sniff_realtime(int(count), int(timeout))
-        return flask.jsonify({"result": "[o] sniffer completed."})
-    else:
-        return flask.jsonify({"result": "[x] sniffer is buzy."})
-
-
 @app.route("/api/set_filter", methods=["get"])
 def set_filter():
     if sniffer.status == "idle":
@@ -49,6 +39,26 @@ def set_filter():
             # sniffer.sniff_offline()
             # return flask.jsonify({"result": f"[o] refiltered by new filter <{sniffer.packet_filter}>.", "data": sniffer.get_update(0)})
             return flask.jsonify({"result": "[x] offline filter is not supportted due to shitty scapy."})
+    else:
+        return flask.jsonify({"result": "[x] sniffer is buzy."})
+
+
+@app.route("/api/test_sniffer", methods=["get"])
+def test_sniffer():
+    if sniffer.status == "idle":
+        sniffer.sniff_offline()
+        return flask.jsonify({"result": f"[o] sniff completed. {len(sniffer.infos)} packets captured."})
+    else:
+        return flask.jsonify({"result": "[x] sniffer is buzy."})
+
+
+@app.route("/api/start_sniffer", methods=["get"])
+def start_sniffer():
+    if sniffer.status == "idle":
+        count = flask.request.args.get("count")
+        timeout = flask.request.args.get("timeout")
+        sniffer.sniff_realtime(int(count), int(timeout))
+        return flask.jsonify({"result": f"[o] sniff completed. {len(sniffer.infos)} packets captured."})
     else:
         return flask.jsonify({"result": "[x] sniffer is buzy."})
 
