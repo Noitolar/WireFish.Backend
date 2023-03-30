@@ -25,3 +25,4 @@ dist-ssr
 
 # mtx
 scapy
+__pycache__
