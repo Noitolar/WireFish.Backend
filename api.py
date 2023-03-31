@@ -54,11 +54,10 @@ class WireFishSniffer:
         return [utils.scapy_str_to_dict(info) for info in self.infos[num_current:]]
 
     def extract_sessions(self):
-        session_indexes = []
-        sessions = self.packets.sessions().values()
-        for session in sessions:
-            session_indexes.append([self.infos.index(utils.extrac_packet_info(pkt)) for pkt in session])
-        return session_indexes
+        session_info = dict()
+        for index, (key, session) in enumerate(self.packets.sessions().items()):
+            session_info[f"session-{index:04d}-[{key}]"] = [self.infos.index(utils.extrac_packet_info(pkt)) for pkt in session]
+        return session_info
 
 
 if __name__ == "__main__":
@@ -76,4 +75,5 @@ if __name__ == "__main__":
     # sniffer.packets.show()
     # print(sniffer.get_update(0))
     # pprint.pprint(utils.scapy_str_to_dict(sniffer.infos[0]))
-    # print(sniffer.extract_sessions())
+    sniffer.sniff_offline()
+    pprint.pprint(sniffer.extract_sessions())

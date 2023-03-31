@@ -1,10 +1,22 @@
 import re
 
 
+def get_layer_names(pkt):
+    counter = 0
+    while counter < 100:
+        layer = pkt.getlayer(counter)
+        if layer is None:
+            break
+        else:
+            counter += 1
+            yield layer.name
+
+
 def extrac_packet_info(pkt):
     cap_time = pkt.time
     summary = pkt.summary()
-    protocol = " / ".join([x if len(x) < 8 and x.isalnum() else x.split(" ")[0] for x in summary.split(" / ")])
+    # protocol = " / ".join([x if len(x) < 8 and x.isalnum() else x.split(" ")[0] for x in summary.split(" / ")])
+    protocol = " || ".join([name for name in get_layer_names(pkt)])
     details = pkt.show(dump=True).replace(" ", "")
 
     src = ""
