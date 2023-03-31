@@ -55,9 +55,9 @@ def test_sniffer():
 @app.route("/api/start_sniffer", methods=["get"])
 def start_sniffer():
     if sniffer.status == "idle":
-        count = flask.request.args.get("count")
-        timeout = flask.request.args.get("timeout")
-        sniffer.sniff_realtime(int(count), int(timeout))
+        count = int(flask.request.args.get("count"))
+        timeout = int(flask.request.args.get("timeout"))
+        sniffer.sniff_realtime(count, timeout)
         return flask.jsonify({"result": f"[o] sniff completed. {len(sniffer.infos)} packets captured."})
     else:
         return flask.jsonify({"result": "[x] sniffer is buzy."})
@@ -66,8 +66,8 @@ def start_sniffer():
 @app.route("/api/update", methods=["get"])
 def update():
     num_current = int(flask.request.args.get("num_current"))
-    if num_current == len(sniffer.infos):
-        if sniffer.status == "idle":
+    if sniffer.status == "idle":
+        if num_current == len(sniffer.infos):
             return flask.jsonify({"result": "[o] sniffer has stopped.", "data": []})
         else:
             return flask.jsonify({"result": "[o] this is the last update.", "data": sniffer.get_update(num_current)})
