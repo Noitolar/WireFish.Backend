@@ -1,5 +1,6 @@
 import flask
 import flask_cors
+import json
 import api
 
 app = flask.Flask(__name__)
@@ -70,9 +71,11 @@ def update():
         if num_current == len(sniffer.infos):
             return flask.jsonify({"result": "[o] sniffer has stopped.", "data": []})
         else:
-            return flask.jsonify({"result": "[o] this is the last update.", "data": sniffer.get_update(num_current)})
+            # return flask.jsonify({"result": "[o] this is the last update.", "data": sniffer.get_update(num_current)})
+            return flask.Response(json.dumps({"result": "[o] this is the last update.", "data": sniffer.get_update(num_current)}), mimetype="application/json")
     else:
-        return flask.jsonify({"result": "[o] updated.", "data": sniffer.get_update(num_current)})
+        # return flask.jsonify({"result": "[o] updated.", "data": sniffer.get_update(num_current)})
+        return flask.Response(json.dumps({"result": "[o] updated.", "data": sniffer.get_update(num_current)}), mimetype="application/json")
 
 
 @app.route("/api/sessions", methods=["get"])
