@@ -2,27 +2,31 @@
 
 ## 概要
 
-WireFish项目的后端接口，主要是Flask服务器+Scapy的结构。
+WireFish项目的后端接口，主要是Flask服务器+Scapy的结构
 
 ## 运行环境
 
 系统：Windows
 
+解释器：Python3.10
+
 网络端口：http://localhost:5000
 
-## 基本结构
-
-* ./dist/app.exe：使用pyinstaller封装的可执行文件。
-* api.py：sniffer类
-* app.py：Flask服务器
-* utils.py：工具库
-* sample.pcap：用于静态测试的数据包文件
+程序本体已经打包好，可以在任何Windows系统中直接运行
 
 ## 主要依赖
 
 * flask：轻量级python服务器框架
 * flask-cors：服务器跨域
-* scapy：libpcap/winpcap的python封装，同时本项目中对原版scapy做了一些修改。
+* scapy：libpcap/winpcap的python封装，同时本项目中对原版scapy做了一些修改
+
+## 基本结构
+
+* ./dist/app.exe：使用pyinstaller封装的可执行文件
+* api.py：sniffer类
+* app.py：Flask服务器
+* utils.py：工具库
+* sample.pcap：用于静态测试的数据包文件
 
 ## 嗅探器类
 
