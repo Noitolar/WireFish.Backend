@@ -26,3 +26,6 @@ dist-ssr
 # mtx
 scapy
 __pycache__
+build
+dist
+*.spec
