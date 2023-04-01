@@ -15,6 +15,12 @@ def index():
     return "<h1>Hello!<h1/>"
 
 
+@app.route("/api/get_interfaces", methods=["get"])
+def geinterfaces():
+    interfaces = [interface_info[1] for interface_info in sniffer.get_network_interfaces()]
+    return flask.jsonify({"result": f"{len(interfaces)} interfaces detected.", "data": interfaces})
+
+
 @app.route("/api/set_interface", methods=["get"])
 def set_interface():
     if sniffer.status == "idle":
