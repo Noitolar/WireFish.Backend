@@ -16,7 +16,7 @@ def index():
 
 
 @app.route("/api/get_interfaces", methods=["get"])
-def geinterfaces():
+def get_interfaces():
     interfaces = [interface_info[1] for interface_info in sniffer.get_network_interfaces()]
     return flask.jsonify({"result": f"{len(interfaces)} interfaces detected.", "data": interfaces})
 

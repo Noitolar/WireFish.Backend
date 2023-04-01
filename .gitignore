@@ -27,5 +27,4 @@ dist-ssr
 scapy
 __pycache__
 build
-dist
 *.spec
